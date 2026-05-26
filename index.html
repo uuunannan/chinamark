@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>振华营销 | ChinaMark Pro Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+/* ═══════════════════════════════════════
+   CSS VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --bg: #f5f3ef;
+  --bg2: #eceae4;
+  --surface: #ffffff;
+  --surface2: #faf9f7;
+  --border: #e0ddd7;
+  --border2: #d0cdc6;
+  --text: #1a1917;
+  --text2: #4a4845;
+  --text3: #8a8784;
+  --accent: #c8392b;
+  --accent2: #e8523d;
+  --gold: #c9a84c;
+  --gold2: #f0d060;
+  --teal: #2a7a6e;
+  --teal2: #3aa090;
+  --blue: #1a4a8a;
+  --blue2: #2a6ac0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow2: 0 4px 24px rgba(0,0,0,0.12);
+  --radius: 10px;
+  --radius2: 6px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  font-size: 11px;
+}
+
+/* ═══════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════ */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #1a1210 0%, #2d1a0e 30%, #1a2a1e 70%, #0e1a2a 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-bg-pattern {
+  position: absolute; inset: 0; opacity: 0.04;
+  background-image: repeating-linear-gradient(
+    45deg, #c8392b 0, #c8392b 1px, transparent 0, transparent 50%
+  );
+  background-size: 20px 20px;
+}
+.login-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  padding: 40px 48px;
+  width: 420px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  position: relative;
+  animation: loginSlide 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes loginSlide {
+  from { opacity:0; transform: translateY(32px) scale(0.96); }
+  to { opacity:1; transform: translateY(0) scale(1); }
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.login-logo .cn { font-family:'Noto Sans SC',sans-serif; font-size:22px; font-weight:700; color:var(--accent); letter-spacing:4px; }
+.login-logo .en { font-size:10px; letter-spacing:3px; color:var(--text3); text-transform:uppercase; margin-top:2px; }
+.login-logo .divider { width:40px; height:2px; background:var(--gold); margin:10px auto; }
+.login-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:20px; text-align:center; }
+.login-field { margin-bottom:14px; }
+.login-field label { display:block; font-size:10px; color:var(--text3); margin-bottom:5px; letter-spacing:1px; text-transform:uppercase; }
+.login-field input {
+  width:100%; padding:10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius2);
+  font-size:12px; font-family:inherit;
+  background: var(--bg);
+  transition: border-color 0.2s;
+}
+.login-field input:focus { outline:none; border-color:var(--accent); }
+.login-btn {
+  width:100%; padding:11px;
+  background: var(--accent);
+  color:#fff; border:none;
+  border-radius: var(--radius2);
+  font-size:12px; font-weight:700;
+  cursor:pointer; letter-spacing:1px;
+  transition: background 0.2s;
+  margin-top:4px;
+}
+.login-btn:hover { background:var(--accent2); }
+.login-divider { text-align:center; margin:16px 0; color:var(--text3); font-size:10px; letter-spacing:1px; position:relative; }
+.login-divider::before, .login-divider::after { content:''; position:absolute; top:50%; width:40%; height:1px; background:var(--border); }
+.login-divider::before { left:0; } .login-divider::after { right:0; }
+
+/* Google Sign-In Button */
+.g-signin-wrap { display:flex; justify-content:center; margin-top:4px; }
+#googleSignInDiv { width:100%; }
+.google-btn-custom {
+  width:100%; padding:10px 14px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius2);
+  background:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-size:12px; font-family:inherit; font-weight:500;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.google-btn-custom:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); border-color:#aaa; }
+.google-btn-custom svg { width:18px; height:18px; }
+.role-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:9px; font-weight:700; letter-spacing:1px; }
+.role-admin { background:#fef3f2; color:var(--accent); }
+.role-leader { background:#f0faf9; color:var(--teal); }
+.role-member { background:#f0f4ff; color:var(--blue); }
+.login-accounts { margin-top:14px; border-top:1px solid var(--border); padding-top:12px; }
+.login-accounts p { font-size:9px; color:var(--text3); margin-bottom:8px; letter-spacing:1px; text-transform:uppercase; }
+.account-list { display:flex; flex-direction:column; gap:5px; }
+.account-item {
+  display:flex; align-items:center; gap:10px; padding:7px 10px;
+  border:1px solid var(--border); border-radius:6px;
+  cursor:pointer; transition:background 0.15s;
+}
+.account-item:hover { background:var(--bg); }
+.account-avatar {
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.account-info { flex:1; }
+.account-name { font-size:11px; font-weight:600; }
+.account-role-line { font-size:9px; color:var(--text3); margin-top:1px; }
+
+/* ═══════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════ */
+#app {
+  display: none;
+  width: 100vw; height: 100vh;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  height: 44px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  flex-shrink: 0;
+  position: relative; z-index: 100;
+}
+.topbar-logo {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.topbar-logo .cn { font-family:'Noto Sans SC',sans-serif; font-size:14px; font-weight:700; color:var(--accent); }
+.topbar-logo .en { font-size:9px; color:var(--text3); letter-spacing:2px; }
+.topbar-logo .dot { width:4px; height:4px; background:var(--gold); border-radius:50%; }
+.topbar-divider { width:1px; height:22px; background:var(--border); }
+
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.topbar-time { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); }
+.topbar-weather { font-size:10px; color:var(--text2); display:flex; align-items:center; gap:4px; }
+.user-chip {
+  display:flex; align-items:center; gap:6px; padding:4px 10px 4px 6px;
+  border:1px solid var(--border); border-radius:20px; cursor:pointer;
+  transition:background 0.15s;
+}
+.user-chip:hover { background:var(--bg); }
+.user-chip-avatar {
+  width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; color:#fff;
+}
+.user-chip-name { font-size:10px; font-weight:600; }
+.user-chip-role { font-size:8px; color:var(--text3); }
+.btn-logout {
+  padding:4px 10px; border:1px solid var(--border2);
+  border-radius:5px; background:none; font-size:10px;
+  font-family:inherit; color:var(--text2); cursor:pointer;
+  transition:background 0.15s;
+}
+.btn-logout:hover { background:#fef3f2; color:var(--accent); border-color:var(--accent); }
+
+/* MAIN GRID */
+.main-grid {
+  flex:1; display:grid;
+  grid-template-columns: 200px 1fr 220px;
+  grid-template-rows: 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════
+   LEFT SIDEBAR
+═══════════════════════════════════════ */
+.sidebar-left {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction:column;
+  overflow: hidden;
+}
+.sidebar-section {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-section:last-child { border-bottom: none; flex:1; overflow:hidden; display:flex; flex-direction:column; }
+.section-title {
+  font-size: 9px; font-weight:700; color:var(--text3);
+  letter-spacing: 1.5px; text-transform:uppercase;
+  margin-bottom: 8px; display:flex; align-items:center; gap:5px;
+}
+.section-title .dot { width:6px; height:6px; border-radius:2px; }
+
+/* KPI Cards in sidebar */
+.kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.kpi-card {
+  background: var(--bg);
+  border-radius: var(--radius2); padding:7px 8px;
+  border:1px solid var(--border);
+}
+.kpi-label { font-size:8px; color:var(--text3); margin-bottom:3px; }
+.kpi-value { font-family:'DM Mono',monospace; font-size:13px; font-weight:700; }
+.kpi-value.red { color:var(--accent); }
+.kpi-value.gold { color:var(--gold); }
+.kpi-value.teal { color:var(--teal); }
+.kpi-value.blue { color:var(--blue); }
+.kpi-change { font-size:8px; margin-top:2px; }
+.kpi-change.up { color:var(--teal); }
+.kpi-change.down { color:var(--accent); }
+
+/* Team list */
+.team-list { display:flex; flex-direction:column; gap:4px; flex:1; overflow-y:auto; }
+.team-member {
+  display:flex; align-items:center; gap:7px; padding:5px 6px;
+  border-radius:5px; cursor:pointer;
+  transition:background 0.15s;
+}
+.team-member:hover { background:var(--bg); }
+.member-avatar {
+  width:24px; height:24px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.member-info { flex:1; min-width:0; }
+.member-name { font-size:10px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.member-task { font-size:8px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.member-status { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.status-online { background:#2ecc71; }
+.status-away { background:#f39c12; }
+.status-busy { background:var(--accent); }
+
+/* ═══════════════════════════════════════
+   CENTER CONTENT
+   Layout: 3 columns (chart | calendar | tasks), bottom row spans all 3
+═══════════════════════════════════════ */
+.center-content {
+  display: grid;
+  grid-template-columns: 1fr 200px 180px;
+  grid-template-rows: 1fr 130px;
+  gap: 8px;
+  padding: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* CHART AREA - col 1, row 1 */
+.chart-area {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  display: flex; flex-direction:column;
+  overflow: hidden;
+  grid-column: 1; grid-row: 1;
+}
+.chart-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:6px; flex-shrink:0;
+}
+.chart-title { font-size:11px; font-weight:700; color:var(--text); }
+.chart-tabs { display:flex; gap:3px; }
+.chart-tab {
+  padding:3px 7px; border-radius:4px; border:1px solid var(--border);
+  font-size:9px; cursor:pointer; background:none; font-family:inherit;
+  color:var(--text3); transition:all 0.15s;
+}
+.chart-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.chart-wrap { flex:1; position:relative; min-height:0; overflow:hidden; }
+
+/* CALENDAR - col 2, row 1 */
+.calendar-area {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  display: flex; flex-direction:column;
+  overflow: hidden;
+  grid-column: 2; grid-row: 1;
+}
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; flex-shrink:0; }
+.cal-title { font-size:10px; font-weight:700; }
+.cal-nav { display:flex; gap:3px; }
+.cal-nav button {
+  width:18px; height:18px; border-radius:3px; border:1px solid var(--border);
+  background:none; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;
+  transition:background 0.15s;
+}
+.cal-nav button:hover { background:var(--bg); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; flex-shrink:0; }
+.cal-day-header { font-size:7px; color:var(--text3); text-align:center; padding:2px 0; font-weight:600; }
+.cal-day {
+  aspect-ratio: 1; display:flex; align-items:center; justify-content:center;
+  border-radius:3px; font-size:8px; cursor:pointer; position:relative;
+  transition:background 0.15s; font-weight:500;
+}
+.cal-day:hover { background:var(--bg); }
+.cal-day.today { background:var(--accent); color:#fff; font-weight:700; }
+.cal-day.has-event::after { content:''; position:absolute; bottom:1px; width:3px; height:3px; border-radius:50%; background:var(--gold); }
+.cal-day.today.has-event::after { background:#fff; }
+.cal-day.other-month { color:var(--text3); }
+.cal-events-label { font-size:8px; color:var(--text3); margin:5px 0 3px; font-weight:700; letter-spacing:0.8px; flex-shrink:0; }
+.cal-events { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; min-height:0; }
+.cal-event {
+  display:flex; align-items:center; gap:5px; padding:3px 6px;
+  border-radius:4px; border-left:2px solid; font-size:8px; flex-shrink:0;
+}
+.cal-event.red { border-color:var(--accent); background:#fef3f2; }
+.cal-event.teal { border-color:var(--teal); background:#f0faf9; }
+.cal-event.gold { border-color:var(--gold); background:#fdf9ee; }
+.cal-event.blue { border-color:var(--blue); background:#f0f4ff; }
+.cal-event-time { font-family:'DM Mono',monospace; color:var(--text3); white-space:nowrap; font-size:7px; }
+.cal-event-text { font-weight:500; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* TASKS - col 3, row 1 */
+.tasks-area {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  display: flex; flex-direction:column;
+  overflow: hidden;
+  grid-column: 3; grid-row: 1;
+}
+.task-list { display:flex; flex-direction:column; gap:3px; flex:1; overflow-y:auto; min-height:0; }
+.task-item {
+  display:flex; align-items:center; gap:6px; padding:4px 6px;
+  border-radius:4px; border:1px solid var(--border);
+  cursor:pointer; transition:background 0.15s; font-size:9px; flex-shrink:0;
+}
+.task-item:hover { background:var(--bg); }
+.task-check {
+  width:13px; height:13px; border-radius:3px; border:1.5px solid var(--border2);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:7px; cursor:pointer; transition:all 0.15s;
+}
+.task-check.done { background:var(--teal); border-color:var(--teal); color:#fff; }
+.task-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.task-text.done { text-decoration:line-through; color:var(--text3); }
+.task-tag { font-size:7px; padding:1px 5px; border-radius:10px; font-weight:600; flex-shrink:0; }
+.task-tag.urgent { background:#fef3f2; color:var(--accent); }
+.task-tag.normal { background:#f0f4ff; color:var(--blue); }
+.task-tag.low { background:#f0faf9; color:var(--teal); }
+.task-add {
+  display:flex; gap:4px; margin-top:5px; flex-shrink:0;
+}
+.task-add input {
+  flex:1; padding:4px 7px; border:1px solid var(--border); border-radius:4px;
+  font-size:9px; font-family:inherit; background:var(--bg); min-width:0;
+}
+.task-add input:focus { outline:none; border-color:var(--accent); }
+.task-add button {
+  padding:4px 8px; background:var(--accent); color:#fff; border:none;
+  border-radius:4px; font-size:9px; cursor:pointer; font-family:inherit; flex-shrink:0;
+}
+
+/* BOTTOM ROW - spans all 3 columns */
+.bottom-row {
+  grid-column: 1 / 4;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  overflow: hidden;
+}
+.mini-chart-area {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  display:flex; flex-direction:column;
+  overflow: hidden;
+}
+.mini-chart-wrap { flex:1; position:relative; min-height:0; overflow:hidden; }
+
+/* ═══════════════════════════════════════
+   RIGHT SIDEBAR
+═══════════════════════════════════════ */
+.sidebar-right {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow: hidden;
+}
+.right-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.right-tab {
+  flex:1; padding:8px 4px; text-align:center;
+  font-size:9px; font-weight:700; letter-spacing:0.5px;
+  cursor:pointer; border-bottom:2px solid transparent;
+  color:var(--text3); transition:all 0.15s;
+}
+.right-tab.active { color:var(--accent); border-color:var(--accent); }
+
+/* POSTIT PANEL */
+.postit-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; padding:10px; }
+.postit-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; flex:1; overflow-y:auto; }
+.postit {
+  border-radius:6px; padding:8px;
+  font-size:9px; line-height:1.5;
+  cursor:pointer; position:relative;
+  transition:transform 0.15s, box-shadow 0.15s;
+  min-height:60px;
+}
+.postit:hover { transform:translateY(-2px); box-shadow:var(--shadow2); }
+.postit.yellow { background:#fff9c4; border:1px solid #f0e060; }
+.postit.pink { background:#fce4ec; border:1px solid #f48fb1; }
+.postit.blue { background:#e3f2fd; border:1px solid #90caf9; }
+.postit.green { background:#e8f5e9; border:1px solid #a5d6a7; }
+.postit-author { font-size:8px; font-weight:700; color:var(--text2); margin-bottom:4px; display:flex; justify-content:space-between; }
+.postit-text { color:var(--text); }
+.postit-add {
+  display:flex; gap:5px; margin-top:8px; flex-shrink:0;
+}
+.postit-add input {
+  flex:1; padding:5px 8px; border:1px solid var(--border); border-radius:5px;
+  font-size:10px; font-family:inherit; background:var(--bg);
+}
+.postit-add input:focus { outline:none; border-color:var(--gold); }
+.postit-add button {
+  padding:5px 10px; background:var(--gold); color:var(--text); border:none;
+  border-radius:5px; font-size:10px; cursor:pointer; font-family:inherit; font-weight:700;
+}
+
+/* CHAT PANEL */
+.chat-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.chat-messages {
+  flex:1; overflow-y:auto; padding:10px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.msg { display:flex; gap:7px; align-items:flex-end; }
+.msg.me { flex-direction:row-reverse; }
+.msg-avatar {
+  width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:8px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.msg-bubble {
+  max-width:70%; padding:6px 9px; border-radius:10px;
+  font-size:10px; line-height:1.5;
+}
+.msg.me .msg-bubble { background:var(--accent); color:#fff; border-radius:10px 10px 2px 10px; }
+.msg:not(.me) .msg-bubble { background:var(--bg2); border-radius:10px 10px 10px 2px; }
+.msg-time { font-size:8px; color:var(--text3); margin-bottom:3px; }
+.msg-sender { font-size:8px; font-weight:700; color:var(--text2); margin-bottom:2px; }
+.chat-input-area {
+  padding:8px 10px; border-top:1px solid var(--border);
+  display:flex; gap:6px; flex-shrink:0;
+}
+.chat-input {
+  flex:1; padding:6px 10px; border:1px solid var(--border);
+  border-radius:20px; font-size:11px; font-family:inherit;
+  background:var(--bg); resize:none; line-height:1.4;
+}
+.chat-input:focus { outline:none; border-color:var(--accent); }
+.chat-send {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--accent); border:none; color:#fff;
+  cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.chat-send:hover { background:var(--accent2); }
+
+/* ═══════════════════════════════════════
+   NOTIFICATION & OVERLAYS
+═══════════════════════════════════════ */
+.notif-badge {
+  width:14px; height:14px; background:var(--accent);
+  border-radius:50%; font-size:8px; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700;
+}
+.toast {
+  position:fixed; bottom:20px; right:20px; z-index:9998;
+  background:var(--text); color:#fff;
+  padding:10px 16px; border-radius:8px;
+  font-size:11px; box-shadow:var(--shadow2);
+  animation: toastIn 0.3s ease;
+  display:none;
+}
+.toast.show { display:flex; align-items:center; gap:8px; }
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Email modal */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:5000;
+  display:flex; align-items:center; justify-content:center;
+  display:none;
+}
+.modal-overlay.open { display:flex; }
+.modal-card {
+  background:#fff; border-radius:12px; padding:28px;
+  width:420px; box-shadow:var(--shadow2);
+}
+.modal-title { font-size:14px; font-weight:700; margin-bottom:16px; }
+.modal-field { margin-bottom:12px; }
+.modal-field label { font-size:10px; color:var(--text3); display:block; margin-bottom:4px; }
+.modal-field input, .modal-field textarea {
+  width:100%; padding:8px 12px; border:1px solid var(--border);
+  border-radius:6px; font-size:11px; font-family:inherit;
+  background:var(--bg);
+}
+.modal-field textarea { height:80px; resize:none; }
+.modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+.modal-btns button {
+  padding:8px 18px; border-radius:6px; border:none;
+  font-size:11px; font-family:inherit; cursor:pointer;
+}
+.btn-cancel { background:var(--bg2); color:var(--text2); }
+.btn-send { background:var(--accent); color:#fff; font-weight:700; }
+
+/* Progress bars */
+.prog-bar { background:var(--border); border-radius:4px; height:5px; overflow:hidden; margin-top:4px; }
+.prog-fill { height:100%; border-radius:4px; transition:width 0.6s ease; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* Gmail send btn */
+.gmail-btn {
+  padding:3px 10px; border:1px solid var(--border2);
+  border-radius:4px; background:none; font-size:9px;
+  font-family:inherit; cursor:pointer; color:var(--text2);
+  display:flex; align-items:center; gap:4px;
+  transition:background 0.15s;
+}
+.gmail-btn:hover { background:#fef3f2; color:var(--accent); }
+
+.announcements { display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
+.announcement {
+  padding:6px 8px; border-radius:5px; background:var(--bg);
+  border-left:3px solid var(--gold); font-size:9px;
+}
+.announcement .ann-title { font-weight:700; margin-bottom:2px; }
+.announcement .ann-body { color:var(--text2); line-height:1.5; }
+.announcement .ann-time { font-size:8px; color:var(--text3); margin-top:2px; }
+
+.trend-row { display:flex; align-items:center; gap:6px; padding:3px 0; font-size:9px; }
+.trend-label { width:60px; flex-shrink:0; color:var(--text2); }
+.trend-bar-wrap { flex:1; background:var(--border); border-radius:3px; height:4px; }
+.trend-bar-fill { height:100%; border-radius:3px; }
+.trend-val { width:32px; text-align:right; font-family:'DM Mono',monospace; font-weight:600; font-size:8px; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-bg-pattern"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="cn">振华营销</div>
+      <div class="en">ChinaMark Pro</div>
+      <div class="divider"></div>
+    </div>
+    <div class="login-title">대시보드 로그인</div>
+
+    <div class="login-field">
+      <label>아이디 / 사원번호</label>
+      <input type="text" id="loginId" placeholder="예: zhangwei@chinamark.kr" value="admin@chinamark.kr">
+    </div>
+    <div class="login-field">
+      <label>비밀번호</label>
+      <input type="password" id="loginPw" placeholder="••••••••" value="1234">
+    </div>
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+
+    <div class="login-divider">또는 소셜 로그인</div>
+
+    <!-- Google Sign-In -->
+    <div class="g-signin-wrap">
+      <button class="google-btn-custom" onclick="googleLogin()">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google 계정으로 로그인
+      </button>
+    </div>
+
+    <div class="login-accounts">
+      <p>빠른 접속 (데모 계정)</p>
+      <div class="account-list" id="accountList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div>
+        <div class="cn">振华营销</div>
+        <div class="en">ChinaMark Pro</div>
+      </div>
+      <div class="dot"></div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="topbarTime"></div>
+      <div class="topbar-weather">🌤 베이징 22°C | 🌧 상하이 18°C | ☀️ 선전 28°C</div>
+      <div class="topbar-divider"></div>
+      <button class="gmail-btn" onclick="openEmailModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        일일결산 발송
+      </button>
+      <div class="user-chip" id="userChip">
+        <div class="user-chip-avatar" id="userAvatar"></div>
+        <div>
+          <div class="user-chip-name" id="userNameTop"></div>
+          <div class="user-chip-role" id="userRoleTop"></div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar-left">
+      <div class="sidebar-section">
+        <div class="section-title"><span class="dot" style="background:var(--accent)"></span>핵심 KPI</div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">월 매출</div>
+            <div class="kpi-value gold">¥4.7M</div>
+            <div class="kpi-change up">▲ 12.3%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">신규 클라이언트</div>
+            <div class="kpi-value teal">23</div>
+            <div class="kpi-change up">▲ 8건</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">캠페인 ROI</div>
+            <div class="kpi-value red">318%</div>
+            <div class="kpi-change up">▲ 41%p</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">전환율</div>
+            <div class="kpi-value blue">6.8%</div>
+            <div class="kpi-change down">▼ 0.3%p</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title"><span class="dot" style="background:var(--teal)"></span>채널 성과</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div>
+            <div class="trend-row">
+              <div class="trend-label">微信 WeChat</div>
+              <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:88%;background:var(--teal)"></div></div>
+              <div class="trend-val" style="color:var(--teal)">88%</div>
+            </div>
+            <div class="trend-row">
+              <div class="trend-label">小红书 RED</div>
+              <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:74%;background:var(--accent)"></div></div>
+              <div class="trend-val" style="color:var(--accent)">74%</div>
+            </div>
+            <div class="trend-row">
+              <div class="trend-label">抖音 TikTok</div>
+              <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:65%;background:var(--gold)"></div></div>
+              <div class="trend-val" style="color:var(--gold)">65%</div>
+            </div>
+            <div class="trend-row">
+              <div class="trend-label">百度 Baidu</div>
+              <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:52%;background:var(--blue)"></div></div>
+              <div class="trend-val" style="color:var(--blue)">52%</div>
+            </div>
+            <div class="trend-row">
+              <div class="trend-label">微博 Weibo</div>
+              <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:41%;background:#9b59b6"></div></div>
+              <div class="trend-val" style="color:#9b59b6">41%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+        <div class="section-title"><span class="dot" style="background:var(--blue)"></span>팀원 현황</div>
+        <div class="team-list" id="teamList"></div>
+      </div>
+    </div>
+
+    <!-- CENTER CONTENT -->
+    <div class="center-content">
+
+      <!-- MAIN CHART -->
+      <div class="chart-area">
+        <div class="chart-header">
+          <div class="chart-title">📈 매출 & 캠페인 성과 분석</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="chart-tabs">
+              <button class="chart-tab active" onclick="switchChart(this,'daily')">일일</button>
+              <button class="chart-tab" onclick="switchChart(this,'weekly')">주간</button>
+              <button class="chart-tab" onclick="switchChart(this,'monthly')">월간</button>
+              <button class="chart-tab" onclick="switchChart(this,'quarterly')">분기</button>
+              <button class="chart-tab" onclick="switchChart(this,'yearly')">연간</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </div>
+
+      <!-- CALENDAR (right column, rows 1-2) -->
+      <div class="calendar-area">
+        <div class="cal-header">
+          <div class="cal-title" id="calTitle">📅 2025년 1월</div>
+          <div class="cal-nav">
+            <button onclick="prevMonth()">‹</button>
+            <button onclick="nextMonth()">›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-events-label">이번 달 일정</div>
+        <div class="cal-events" id="calEvents"></div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="tasks-area">
+        <div class="chart-header" style="margin-bottom:5px;">
+          <div class="chart-title" style="font-size:10px;">✅ 나의 업무</div>
+          <div style="font-size:8px;color:var(--text3);" id="taskProgress">0/0 완료</div>
+        </div>
+        <div class="task-list" id="taskList"></div>
+        <div class="task-add">
+          <input id="taskInput" placeholder="업무 추가..." onkeydown="if(event.key==='Enter')addTask()">
+          <button onclick="addTask()">+</button>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+        <!-- Mini Chart 1: Channel Mix -->
+        <div class="mini-chart-area">
+          <div class="chart-header" style="margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;">🥧 채널 믹스</div>
+          </div>
+          <div class="mini-chart-wrap">
+            <canvas id="channelChart"></canvas>
+          </div>
+        </div>
+        <!-- Mini Chart 2: Conversion Funnel -->
+        <div class="mini-chart-area">
+          <div class="chart-header" style="margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;">🔽 전환 퍼널</div>
+          </div>
+          <div class="mini-chart-wrap">
+            <canvas id="funnelChart"></canvas>
+          </div>
+        </div>
+        <!-- Announcements -->
+        <div class="mini-chart-area">
+          <div class="chart-header" style="margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;">📢 공지사항</div>
+          </div>
+          <div class="announcements" id="announcements"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-right">
+      <div class="right-tabs">
+        <div class="right-tab active" onclick="switchRightTab(this,'postit')">📌 메모</div>
+        <div class="right-tab" onclick="switchRightTab(this,'chat')">💬 채팅</div>
+      </div>
+
+      <!-- POSTIT PANEL -->
+      <div id="postitPanel" class="postit-panel">
+        <div class="postit-grid" id="postitGrid"></div>
+        <div class="postit-add">
+          <input id="postitInput" placeholder="메모 추가...">
+          <button onclick="addPostit()">+</button>
+        </div>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div id="chatPanel" class="chat-panel" style="display:none;">
+        <div style="padding:6px 10px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;flex-shrink:0;">
+          <span style="width:6px;height:6px;background:#2ecc71;border-radius:50%;display:inline-block;"></span>
+          팀 단체 채팅방 · 온라인 <span id="onlineCount">5</span>명
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" rows="1" placeholder="메시지 입력..." onkeydown="handleChatKey(event)"></textarea>
+          <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal-card">
+    <div class="modal-title">📧 일일 결산 보고서 발송</div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:14px;">오늘의 주요 지표가 자동 포함됩니다. 수신자 이메일을 입력하세요.</div>
+    <div class="modal-field">
+      <label>수신자 이메일</label>
+      <input type="email" id="emailTo" placeholder="example@company.com">
+    </div>
+    <div class="modal-field">
+      <label>추가 메모 (선택)</label>
+      <textarea id="emailMemo" placeholder="오늘의 특이사항 또는 코멘트..."></textarea>
+    </div>
+    <div style="background:var(--bg);border-radius:6px;padding:10px;font-size:9px;color:var(--text2);margin-bottom:4px;">
+      <b>자동 포함 내용:</b> 일일 매출 ¥156,000 | 신규 리드 7건 | 캠페인 ROI 318% | 전환율 6.8%<br>
+      <span style="color:var(--text3)">* Gmail API 연동 시 실제 발송됩니다 (현재 데모: mailto 방식)</span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEmailModal()">취소</button>
+      <button class="btn-send" onclick="sendEmail()">📨 발송</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA & STATE
+═══════════════════════════════════════ */
+const COLORS = ['var(--accent)','var(--gold)','var(--teal)','var(--blue)','#9b59b6'];
+
+const ACCOUNTS = [
+  { id:'admin@chinamark.kr', pw:'1234', name:'장웨이 (张伟)', role:'관리자', dept:'경영진', color:'#c8392b' },
+  { id:'leader1@chinamark.kr', pw:'1234', name:'리나 (李娜)', role:'팀장', dept:'전략마케팅팀', color:'#2a7a6e' },
+  { id:'leader2@chinamark.kr', pw:'1234', name:'왕팡 (王芳)', role:'팀장', dept:'디지털채널팀', color:'#1a4a8a' },
+  { id:'mem1@chinamark.kr', pw:'1234', name:'김지수', role:'팀원', dept:'전략마케팅팀', color:'#c9a84c' },
+  { id:'mem2@chinamark.kr', pw:'1234', name:'박서준', role:'팀원', dept:'디지털채널팀', color:'#9b59b6' },
+];
+
+const TEAM_MEMBERS = [
+  { name:'장웨이 (张伟)', role:'대표이사', color:'#c8392b', status:'online', task:'월간 전략 회의 준비' },
+  { name:'리나 (李娜)', role:'전략마케팅 팀장', color:'#2a7a6e', status:'online', task:'Q2 캠페인 기획서' },
+  { name:'왕팡 (王芳)', role:'디지털채널 팀장', color:'#1a4a8a', status:'busy', task:'WeChat 광고 최적화' },
+  { name:'김지수', role:'콘텐츠 마케터', color:'#c9a84c', status:'online', task:'小红书 콘텐츠 제작' },
+  { name:'박서준', role:'데이터 애널리스트', color:'#9b59b6', status:'away', task:'전환율 리포트 작성' },
+  { name:'쑤안 (苏安)', role:'크리에이티브 디자이너', color:'#e67e22', status:'online', task:'배너 디자인 수정' },
+  { name:'최민준', role:'B2B 영업', color:'#16a085', status:'online', task:'클라이언트 미팅 준비' },
+];
+
+const SCHEDULE_EVENTS = [
+  { day:3, title:'베이징 클라이언트 미팅', time:'10:00', type:'red' },
+  { day:7, title:'Q2 전략 보고', time:'14:00', type:'teal' },
+  { day:10, title:'소홍서 캠페인 런칭', time:'09:00', type:'gold' },
+  { day:14, title:'주간 팀 회의', time:'10:30', type:'blue' },
+  { day:18, title:'상하이 출장', time:'종일', type:'red' },
+  { day:21, title:'월간 결산 발표', time:'15:00', type:'teal' },
+  { day:25, title:'신규 클라이언트 PT', time:'11:00', type:'gold' },
+  { day:28, title:'분기 전략 수립', time:'13:00', type:'blue' },
+];
+
+const ANNOUNCEMENTS_DATA = [
+  { title:'🇨🇳 Q2 중국 마케팅 트렌드 세미나', body:'5월 15일 오후 2시 온라인 개최. 전 팀원 필참.', time:'오늘 09:12' },
+  { title:'📊 4월 결산 리포트 공유', body:'전월 대비 매출 12.3% 상승. 전략팀 수고하셨습니다!', time:'어제 18:30' },
+  { title:'🔐 VPN 접속 정책 변경', body:'중국 플랫폼 접근 시 반드시 회사 VPN 사용 바람.', time:'3일 전' },
+];
+
+const POSTIT_DATA = [
+  { text:'微信 KOL 협찬 단가 재협상 필요 - ¥50K 이하로', author:'리나', color:'yellow', time:'10:22' },
+  { text:'百度 키워드 입찰가 조정 (경쟁사 분석 후)', author:'왕팡', color:'blue', time:'09:45' },
+  { text:'소홍서 팔로워 10만 돌파! 🎉 이벤트 기획하기', author:'김지수', color:'pink', time:'어제' },
+  { text:'Q2 예산 배분: WeChat 40% / 抖音 30% / 기타 30%', author:'장웨이', color:'green', time:'어제' },
+  { text:'클라이언트 A사 계약갱신 6월 1일 마감', author:'최민준', color:'yellow', time:'2일 전' },
+  { text:'GA4 전환추적 태그 누락 건 → 박서준에게 확인', author:'왕팡', color:'pink', time:'2일 전' },
+];
+
+const INIT_CHAT = [
+  { sender:'리나 (李娜)', me:false, color:'#2a7a6e', msg:'안녕하세요 팀! 오늘 베이징 캠페인 수치 확인하셨나요? CTR이 어제보다 15% 올랐어요 👍', time:'09:05' },
+  { sender:'박서준', me:false, color:'#9b59b6', msg:'네! 확인했습니다. 특히 제품 카테고리 A에서 전환율이 크게 뛰었네요. 리포트 오후에 공유드릴게요.', time:'09:08' },
+  { sender:'왕팡 (王芳)', me:false, color:'#1a4a8a', msg:'抖音 쪽 영상 광고도 오늘부터 시작됐는데 초반 반응 꽤 좋습니다. 지켜보겠습니다!', time:'09:15' },
+  { sender:'김지수', me:false, color:'#c9a84c', msg:'소홍서 포스팅 오전에 올렸는데 저장률이 7%나 나왔어요 ㅎㅎ 오늘 수치 좋을 것 같아요~', time:'09:30' },
+];
+
+let currentUser = null;
+let tasks = [
+  { text:'WeChat 광고 소재 2차 검수', done:false, tag:'urgent' },
+  { text:'百度 SEM 키워드 리스트 업데이트', done:false, tag:'normal' },
+  { text:'클라이언트 월간 리포트 초안 작성', done:false, tag:'urgent' },
+  { text:'팀 회의 아젠다 작성', done:true, tag:'low' },
+  { text:'소홍서 KOL 리스트 정리', done:true, tag:'normal' },
+];
+let postits = [...POSTIT_DATA];
+let chatMessages = [...INIT_CHAT];
+let calYear = 2025, calMonth = 0; // Jan 2025
+let mainChartInstance = null, channelChartInstance = null, funnelChartInstance = null;
+let currentChartMode = 'daily';
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init() {
+  renderAccountList();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Try restore session
+  const saved = sessionStorage.getItem('cmUser');
+  if (saved) { currentUser = JSON.parse(saved); showApp(); }
+}
+
+function updateClock() {
+  const now = new Date();
+  const t = document.getElementById('topbarTime');
+  if (t) t.textContent = now.toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function renderAccountList() {
+  const el = document.getElementById('accountList');
+  el.innerHTML = ACCOUNTS.map(a => `
+    <div class="account-item" onclick="quickLogin('${a.id}')">
+      <div class="account-avatar" style="background:${a.color}">${a.name.charAt(0)}</div>
+      <div class="account-info">
+        <div class="account-name">${a.name}</div>
+        <div class="account-role-line">${a.dept} · <span class="role-badge ${a.role==='관리자'?'role-admin':a.role==='팀장'?'role-leader':'role-member'}">${a.role}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function quickLogin(id) {
+  document.getElementById('loginId').value = id;
+  document.getElementById('loginPw').value = '1234';
+  doLogin();
+}
+
+function doLogin() {
+  const id = document.getElementById('loginId').value.trim();
+  const pw = document.getElementById('loginPw').value.trim();
+  const user = ACCOUNTS.find(a => a.id === id && a.pw === pw);
+  if (!user) { showToast('❌ 아이디 또는 비밀번호가 올바르지 않습니다.'); return; }
+  currentUser = user;
+  sessionStorage.setItem('cmUser', JSON.stringify(user));
+  showApp();
+}
+
+function googleLogin() {
+  if (typeof google !== 'undefined' && google.accounts) {
+    // 실제 Google OAuth 팝업 호출
+    google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // One Tap이 차단된 경우 OAuth 팝업 직접 열기
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: '421735615106-81rho5ud02f128p1i5hfr0ured21vbkc.apps.googleusercontent.com',
+          scope: 'openid email profile',
+          callback: (tokenResponse) => {
+            if (tokenResponse.access_token) {
+              fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: 'Bearer ' + tokenResponse.access_token }
+              })
+              .then(r => r.json())
+              .then(info => {
+                currentUser = {
+                  id: info.email,
+                  name: info.name,
+                  role: '팀원',
+                  dept: 'Google 계정',
+                  color: '#4285F4'
+                };
+                sessionStorage.setItem('cmUser', JSON.stringify(currentUser));
+                showApp();
+                showToast(`🔐 Google 로그인 성공: ${info.name}`);
+              })
+              .catch(() => showToast('❌ 사용자 정보를 가져오지 못했습니다.'));
+            }
+          }
+        });
+        client.requestAccessToken({ prompt: 'select_account' });
+      }
+    });
+  } else {
+    showToast('⏳ Google 로그인 스크립트가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+  }
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  // Set user chip
+  document.getElementById('userAvatar').style.background = currentUser.color;
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+  document.getElementById('userNameTop').textContent = currentUser.name;
+  document.getElementById('userRoleTop').textContent = currentUser.role + ' · ' + currentUser.dept;
+
+  renderAll();
+  setTimeout(initCharts, 100);
+}
+
+function doLogout() {
+  sessionStorage.removeItem('cmUser');
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function renderAll() {
+  renderTeamList();
+  renderTasks();
+  renderCalendar();
+  renderPostits();
+  renderChat();
+  renderAnnouncements();
+}
+
+/* ═══════════════════════════════════════
+   TEAM LIST
+═══════════════════════════════════════ */
+function renderTeamList() {
+  document.getElementById('teamList').innerHTML = TEAM_MEMBERS.map(m => `
+    <div class="team-member">
+      <div class="member-avatar" style="background:${m.color}">${m.name.charAt(0)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.name}</div>
+        <div class="member-task">${m.task}</div>
+      </div>
+      <div class="member-status status-${m.status}" title="${m.status==='online'?'온라인':m.status==='away'?'자리비움':'바쁨'}"></div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════
+   TASKS
+═══════════════════════════════════════ */
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  list.innerHTML = tasks.map((t,i) => `
+    <div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTask(${i})">${t.done?'✓':''}</div>
+      <div class="task-text ${t.done?'done':''}">${t.text}</div>
+      <span class="task-tag ${t.tag}">${t.tag==='urgent'?'긴급':t.tag==='normal'?'일반':'낮음'}</span>
+    </div>
+  `).join('');
+  const done = tasks.filter(t=>t.done).length;
+  document.getElementById('taskProgress').textContent = `${done}/${tasks.length} 완료`;
+}
+
+function toggleTask(i) {
+  tasks[i].done = !tasks[i].done;
+  renderTasks();
+}
+
+function addTask() {
+  const inp = document.getElementById('taskInput');
+  const v = inp.value.trim();
+  if (!v) return;
+  tasks.unshift({ text:v, done:false, tag:'normal' });
+  inp.value = '';
+  renderTasks();
+  showToast('✅ 업무가 추가되었습니다.');
+}
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+function renderCalendar() {
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('calTitle').textContent = `📅 ${calYear}년 ${months[calMonth]}`;
+
+  const grid = document.getElementById('calGrid');
+  const days = ['일','월','화','수','목','금','토'];
+  let html = days.map(d=>`<div class="cal-day-header">${d}</div>`).join('');
+
+  const first = new Date(calYear, calMonth, 1).getDay();
+  const total = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+
+  for (let i=0; i<first; i++) {
+    const prevDay = new Date(calYear, calMonth, -first+i+1).getDate();
+    html += `<div class="cal-day other-month">${prevDay}</div>`;
+  }
+  for (let d=1; d<=total; d++) {
+    const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
+    const hasEv = SCHEDULE_EVENTS.some(e=>e.day===d);
+    html += `<div class="cal-day${isToday?' today':''}${hasEv?' has-event':''}" onclick="showDayEvents(${d})">${d}</div>`;
+  }
+  grid.innerHTML = html;
+
+  const evEl = document.getElementById('calEvents');
+  evEl.innerHTML = SCHEDULE_EVENTS.map(e=>`
+    <div class="cal-event ${e.type}">
+      <div class="cal-event-time">${String(e.day).padStart(2,'0')}일 ${e.time}</div>
+      <div class="cal-event-text">${e.title}</div>
+    </div>
+  `).join('');
+}
+
+function prevMonth() { if(calMonth===0){calMonth=11;calYear--;}else{calMonth--;} renderCalendar(); }
+function nextMonth() { if(calMonth===11){calMonth=0;calYear++;}else{calMonth++;} renderCalendar(); }
+function showDayEvents(d) {
+  const ev = SCHEDULE_EVENTS.filter(e=>e.day===d);
+  if(ev.length) showToast(`📅 ${d}일: ${ev.map(e=>e.title).join(', ')}`);
+}
+
+/* ═══════════════════════════════════════
+   POSTITS
+═══════════════════════════════════════ */
+const POSTIT_COLORS = ['yellow','pink','blue','green'];
+function renderPostits() {
+  document.getElementById('postitGrid').innerHTML = postits.map((p,i) => `
+    <div class="postit ${p.color}" onclick="deletePostit(${i},event)">
+      <div class="postit-author"><span>${p.author}</span><span>${p.time}</span></div>
+      <div class="postit-text">${p.text}</div>
+    </div>
+  `).join('');
+}
+function addPostit() {
+  const inp = document.getElementById('postitInput');
+  const v = inp.value.trim();
+  if (!v) return;
+  postits.unshift({ text:v, author:currentUser?currentUser.name.split(' ')[0]:'나', color:POSTIT_COLORS[postits.length%4], time:'방금' });
+  inp.value = '';
+  renderPostits();
+  showToast('📌 메모가 추가되었습니다.');
+}
+function deletePostit(i,e) {
+  if(confirm('이 메모를 삭제하시겠습니까?')) { postits.splice(i,1); renderPostits(); }
+}
+
+/* ═══════════════════════════════════════
+   CHAT
+═══════════════════════════════════════ */
+function renderChat() {
+  const el = document.getElementById('chatMessages');
+  el.innerHTML = chatMessages.map(m => {
+    const isMe = currentUser && (m.me || m.sender === currentUser.name);
+    return `
+      <div class="msg ${isMe?'me':''}">
+        <div class="msg-avatar" style="background:${m.color}">${m.sender.charAt(0)}</div>
+        <div>
+          ${!isMe?`<div class="msg-sender">${m.sender}</div>`:''}
+          <div class="msg-bubble">${m.msg}</div>
+          <div class="msg-time" style="${isMe?'text-align:right':''}">${m.time}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const v = inp.value.trim();
+  if (!v || !currentUser) return;
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  chatMessages.push({ sender:currentUser.name, me:true, color:currentUser.color, msg:v, time });
+  inp.value = '';
+  renderChat();
+
+  // Auto reply for demo
+  setTimeout(() => {
+    const replies = [
+      '네, 확인했습니다! 👍',
+      '알겠습니다. 검토 후 공유드릴게요.',
+      '좋은 정보 감사합니다 😊',
+      '오늘 회의 때 같이 논의해봐요!',
+      '수치 보고 깜짝 놀랐어요 ㅎㅎ',
+    ];
+    const responder = TEAM_MEMBERS.filter(m=>m.name!==currentUser.name)[Math.floor(Math.random()*6)];
+    if(responder) {
+      chatMessages.push({
+        sender: responder.name, me:false, color:responder.color,
+        msg: replies[Math.floor(Math.random()*replies.length)],
+        time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+      });
+      renderChat();
+    }
+  }, 1200);
+}
+
+function handleChatKey(e) {
+  if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+/* ═══════════════════════════════════════
+   ANNOUNCEMENTS
+═══════════════════════════════════════ */
+function renderAnnouncements() {
+  document.getElementById('announcements').innerHTML = ANNOUNCEMENTS_DATA.map(a=>`
+    <div class="announcement">
+      <div class="ann-title">${a.title}</div>
+      <div class="ann-body">${a.body}</div>
+      <div class="ann-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════ */
+const CHART_DATA = {
+  daily: {
+    labels:['월','화','수','목','금','토','일'],
+    revenue:[142,168,155,190,210,175,132],
+    leads:[8,12,9,15,18,14,7],
+    roi:[280,310,295,340,380,320,260]
+  },
+  weekly: {
+    labels:['1주','2주','3주','4주'],
+    revenue:[980,1120,1050,1310],
+    leads:[55,72,61,88],
+    roi:[295,320,308,345]
+  },
+  monthly: {
+    labels:['1월','2월','3월','4월','5월','6월'],
+    revenue:[3800,4100,3950,4400,4200,4700],
+    leads:[210,245,228,290,265,310],
+    roi:[270,288,280,305,298,318]
+  },
+  quarterly: {
+    labels:['Q1 23','Q2 23','Q3 23','Q4 23','Q1 24','Q2 24'],
+    revenue:[11200,12800,13500,15200,14100,16800],
+    leads:[620,730,780,920,840,980],
+    roi:[255,268,278,295,289,318]
+  },
+  yearly: {
+    labels:['2020','2021','2022','2023','2024','2025(YTD)'],
+    revenue:[28000,35000,42000,52000,64000,47000],
+    leads:[1800,2400,3100,3900,5200,4100],
+    roi:[195,215,238,260,285,318]
+  }
+};
+
+function initCharts() {
+  // Main Chart
+  const ctx1 = document.getElementById('mainChart').getContext('2d');
+  const d = CHART_DATA.daily;
+  mainChartInstance = new Chart(ctx1, {
+    type:'bar',
+    data:{
+      labels:d.labels,
+      datasets:[
+        { label:'매출 (만원)', data:d.revenue, backgroundColor:'rgba(200,57,43,0.18)', borderColor:'#c8392b', borderWidth:1.5, yAxisID:'y', type:'bar' },
+        { label:'ROI (%)', data:d.roi, borderColor:'#c9a84c', backgroundColor:'rgba(201,168,76,0.08)', borderWidth:2, yAxisID:'y1', type:'line', tension:0.4, pointRadius:3 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{font:{size:9},boxWidth:12}}},
+      scales:{
+        y:{position:'left',grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9}}},
+        y1:{position:'right',grid:{drawOnChartArea:false},ticks:{font:{size:9},callback:v=>v+'%'}},
+        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9}}}
+      }
+    }
+  });
+
+  // Channel Doughnut
+  const ctx2 = document.getElementById('channelChart').getContext('2d');
+  channelChartInstance = new Chart(ctx2, {
+    type:'doughnut',
+    data:{
+      labels:['WeChat','小红书','抖音','百度','微博'],
+      datasets:[{
+        data:[35,22,20,14,9],
+        backgroundColor:['#2a7a6e','#c8392b','#c9a84c','#1a4a8a','#9b59b6'],
+        borderWidth:2, borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'60%',
+      plugins:{legend:{
+        position:'bottom',
+        labels:{font:{size:7},boxWidth:8,padding:4}
+      }}
+    }
+  });
+
+  // Funnel Bar
+  const ctx3 = document.getElementById('funnelChart').getContext('2d');
+  funnelChartInstance = new Chart(ctx3, {
+    type:'bar',
+    data:{
+      labels:['노출','클릭','방문','관심','전환'],
+      datasets:[{
+        label:'사용자수(천)',
+        data:[1240,380,185,62,28],
+        backgroundColor:['rgba(200,57,43,0.15)','rgba(200,57,43,0.3)','rgba(200,57,43,0.5)','rgba(200,57,43,0.7)','rgba(200,57,43,0.9)'],
+        borderColor:'#c8392b', borderWidth:1.5, borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{font:{size:8}},grid:{color:'rgba(0,0,0,0.04)'}},
+        y:{ticks:{font:{size:8}},grid:{color:'rgba(0,0,0,0.04)'}}
+      }
+    }
+  });
+}
+
+function switchChart(btn, mode) {
+  document.querySelectorAll('.chart-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentChartMode = mode;
+  const d = CHART_DATA[mode];
+  mainChartInstance.data.labels = d.labels;
+  mainChartInstance.data.datasets[0].data = d.revenue;
+  mainChartInstance.data.datasets[1].data = d.roi;
+  mainChartInstance.update();
+}
+
+/* ═══════════════════════════════════════
+   UI CONTROLS
+═══════════════════════════════════════ */
+function switchRightTab(tab, panel) {
+  document.querySelectorAll('.right-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('postitPanel').style.display = panel==='postit' ? 'flex' : 'none';
+  document.getElementById('chatPanel').style.display = panel==='chat' ? 'flex' : 'none';
+  if(panel==='chat') renderChat();
+}
+
+/* ═══════════════════════════════════════
+   EMAIL MODAL (보너스 기능)
+═══════════════════════════════════════ */
+function openEmailModal() {
+  if(!currentUser) { showToast('로그인 후 이용해주세요.'); return; }
+  document.getElementById('emailModal').classList.add('open');
+}
+function closeEmailModal() {
+  document.getElementById('emailModal').classList.remove('open');
+}
+function sendEmail() {
+  const to = document.getElementById('emailTo').value.trim();
+  const memo = document.getElementById('emailMemo').value.trim();
+  if(!to) { showToast('⚠️ 수신자 이메일을 입력해주세요.'); return; }
+
+  const subject = encodeURIComponent('[振华营销] 일일 결산 보고서 - ' + new Date().toLocaleDateString('ko-KR'));
+  const body = encodeURIComponent(
+    `[振华营销 ChinaMark Pro] 일일 결산 보고서\n` +
+    `══════════════════════════════\n` +
+    `📅 날짜: ${new Date().toLocaleDateString('ko-KR')}\n` +
+    `👤 발송자: ${currentUser.name} (${currentUser.role})\n\n` +
+    `📊 핵심 지표\n` +
+    `• 일일 매출: ¥156,000 (전일 대비 +8.2%)\n` +
+    `• 신규 리드: 7건\n` +
+    `• 캠페인 ROI: 318%\n` +
+    `• 전환율: 6.8%\n\n` +
+    `📣 채널별 성과\n` +
+    `• WeChat: 88점\n• 小红书: 74점\n• 抖音: 65점\n• 百度: 52점\n\n` +
+    (memo ? `📝 특이사항\n${memo}\n\n` : '') +
+    `──────────────────────────────\n` +
+    `振华营销 ChinaMark Pro Dashboard\n` +
+    `자동 발송 시스템`
+  );
+
+  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+  closeEmailModal();
+  showToast('📧 메일 클라이언트가 열립니다. Gmail API 연동 시 자동 발송 가능합니다.');
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════
+   GOOGLE SIGN-IN CALLBACK
+═══════════════════════════════════════ */
+function handleCredentialResponse(response) {
+  // Decode JWT to get user info
+  try {
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    currentUser = {
+      id: payload.email,
+      name: payload.name,
+      role: '팀원',
+      dept: '외부 Google 계정',
+      color: '#4285F4'
+    };
+    sessionStorage.setItem('cmUser', JSON.stringify(currentUser));
+    showApp();
+    showToast(`🔐 Google 로그인 성공: ${payload.name}`);
+  } catch(e) {
+    showToast('Google 로그인 처리 중 오류가 발생했습니다.');
+  }
+}
+
+// Initialize Google Sign-In
+window.onload = function() {
+  init();
+  const GSI_POLL = setInterval(() => {
+    if (typeof google !== 'undefined' && google.accounts) {
+      clearInterval(GSI_POLL);
+      google.accounts.id.initialize({
+        client_id: '421735615106-81rho5ud02f128p1i5hfr0ured21vbkc.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+        ux_mode: 'popup'
+      });
+    }
+  }, 200);
+};
+</script>
+</body>
+</html>
